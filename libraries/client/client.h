@@ -12,6 +12,10 @@ void switchClientMenu(int);
 
 void registerCLient();
 
-void loginClient();
+int loginClient();
+
+int getClient(int id, FILE *nameFile);
+
+int MenuClientLogin();
 
 #endif

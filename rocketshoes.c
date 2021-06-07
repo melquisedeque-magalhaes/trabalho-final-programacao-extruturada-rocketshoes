@@ -3,6 +3,7 @@
 
 #include "./libraries/settings/settings.c"
 #include "./libraries/client/client.c"
+#include "./libraries/admin/admin.c"
 
 #define True 1
 #define False 0
@@ -10,7 +11,7 @@
 int menuMain();
 
 int main(void){
-    int optionMenu, optionMenuClient;
+    int optionMenu, optionMenuClient, optionMenuAdmin;
     int amount = 0;
     
     do{
@@ -24,15 +25,14 @@ int main(void){
                 break;
 
             case 2:
-                printf("Option two");
+                optionMenuAdmin = MenuAdmin();
+                switchAdminMenu(optionMenuAdmin);
                 break;
 
 
             default:
                 printf("SAINDO DO PROGRAMA ....\n\n\n");
         }
-        
-        ClearWindows();
         
     }while(optionMenu != 0);    
 
