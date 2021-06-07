@@ -50,7 +50,7 @@ void switchAdminMenu(int optionMenuClient){
 
     FILE *fileAdmin;
 
-    fileAdmin = openFile("admin.dat");
+    fileAdmin = openFile("./files/admin.dat");
 
     if(fileAdmin == NULL)
         printf("\n ERRO de abertura do arquivo! \n");

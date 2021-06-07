@@ -52,7 +52,7 @@ void switchClientMenu(int optionMenuClient){
 
     FILE *fileClient;
 
-    fileClient = openFile("client.dat");
+    fileClient = openFile("./files/client.dat");
 
     if(fileClient == NULL)
         printf("\n ERRO de abertura do arquivo! \n");
