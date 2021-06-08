@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<tenis>
-    <tenis codigo="1">
-        <name>Adidas 
-</name>
-        <preço>100.00</preço>
-        <quantidade>4</quantidade>
-    </tenis>
-</tenis>

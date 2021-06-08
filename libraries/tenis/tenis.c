@@ -172,13 +172,13 @@ void listTenis( FILE *fileTenis ){
 
     fseek(fileTenis, 0, SEEK_SET);
 
-    printf("\nid                    nome                  preço   quantidade\n");
-
-    printf("---------------------------------------------------------------------------\n");
-
     while(fread(&tenis, sizeof(tenis), 1, fileTenis)){
-        if(tenis.del != '*')
-            printf("%5d    %s   %.2f    %d\n", tenis.id, tenis.name, tenis.price, tenis.amount);
+        if(tenis.del != '*'){
+            printf("Id do tenis: %d\n", tenis.id);
+            printf("Nome do tenis: %s\n", tenis.name);
+            printf("Preço do tenis: %.2f\n", tenis.price);
+            printf("Quantidade de tenis no estoque: %d\n", tenis.amount);
+        }
     }
     
 }
@@ -277,8 +277,6 @@ void deletePermanteTenis(){
     fileTenis = openFile("./files/tenis.dat");
     tmpFile = fopen("./files/tenis.tmp", "wb");
 
-    printf("antes tinha : %ld bytes\n", sizeof(fileTenis) * 8);
-
     if(fileTenis == NULL || tmpFile == NULL)
         printf("\n ERRO de abertura do arquivo! \n");
 
@@ -289,8 +287,6 @@ void deletePermanteTenis(){
 			fwrite(&tenis, sizeof(tenis), 1, tmpFile);
     }
     	
-    
-    printf("agora tem tanto: %ld bytes \n", sizeof(tmpFile) * 8);
 
 	fclose(fileTenis);
 	fclose(tmpFile);

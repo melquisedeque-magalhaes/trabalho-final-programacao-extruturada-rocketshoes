@@ -20,4 +20,10 @@ int MenuClientLogin();
 
 void switchLoginMenu(int option, int clientId);
 
+void listClient( FILE *fileClient );
+
+void deleteClient(FILE *fileClient);
+
+void eraseClient(int index, FILE *fileClient);
+
 #endif

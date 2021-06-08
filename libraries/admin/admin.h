@@ -19,4 +19,10 @@ int getAdmin(int id, FILE *nameFile);
 
 int MenuAdminLogin();
 
+void eraseAdmin(int index, FILE *fileAdmin);
+
+void deleteAdmin(FILE *fileAdmin);
+
+void listAdmin( FILE *fileAdmin );
+
 #endif

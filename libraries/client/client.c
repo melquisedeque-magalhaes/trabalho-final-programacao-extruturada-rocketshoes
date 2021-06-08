@@ -251,3 +251,57 @@ void switchLoginMenu(int option, int clientId){
 
     fclose(fileTenis);
 }
+
+void listClient( FILE *fileClient ){
+
+    struct clientData client;
+
+    fseek(fileClient, 0, SEEK_SET);
+
+    while(fread(&client, sizeof(client), 1, fileClient)){
+        if(client.del != '*'){
+            printf("Id do cliente: %d\n", client.id);
+            printf("Nome do cliente: %s\n", client.name);
+            printf("Email do cliente: %s\n", client.email);
+        }
+    }
+    
+}
+
+void deleteClient(FILE *fileClient){
+    struct clientData client;
+    int index;
+
+    do{
+        printf("Digite o codigo do cliente: ");
+        ClearBuffer();
+        scanf("%d", &client.id);
+
+        index = getClient(client.id, fileClient);
+
+        if(index < 0)
+            printf("\n\n   ERRO!, codigo não existente, tente novamente!    \n\n");
+            
+    }while(index < 0);
+
+    if(index > 0)
+        eraseClient(index, fileClient);
+    else 
+        printf("Cliente não encontrado !!!\n");
+}
+
+void eraseClient(int index, FILE *fileClient){
+    struct clientData client;
+
+    fseek(fileClient, (index-1)*sizeof(client), SEEK_SET);
+
+    fread(&client, sizeof(client), 1, fileClient);
+
+    client.del = '*';
+
+    fseek(fileClient, -sizeof(client), SEEK_CUR);
+
+    fwrite(&client, sizeof(client), 1, fileClient);
+
+    printf("Cliente apagado com sucesso!");
+}

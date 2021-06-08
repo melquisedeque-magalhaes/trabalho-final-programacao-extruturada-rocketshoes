@@ -49,11 +49,13 @@ void switchAdminMenu(int optionMenuClient){
 
     /* ABRINDO ARQUIVOS */
 
-    FILE *fileAdmin;
+    FILE *fileAdmin, *fileClient;
 
     fileAdmin = openFile("./files/admin.dat");
 
-    if(fileAdmin == NULL)
+    fileClient = openFile("./files/client.dat");
+
+    if(fileAdmin == NULL || fileClient == NULL)
         printf("\n ERRO de abertura do arquivo! \n");
 
     switch(optionMenuClient) {
@@ -61,13 +63,16 @@ void switchAdminMenu(int optionMenuClient){
             registerAdmin(admin, fileAdmin, -1);
             break;
         case 2:
+            ClearWindows();
+
             isLogin = loginAdmin(admin, fileAdmin);
 
+            ClearWindows();
         
             if(isLogin){
                 do{
                    
-                    option = MenuAdminLogin();
+                    option = MenuAdminLogin(fileAdmin, fileClient);
 
                 }while(option != 0);
             }
@@ -81,6 +86,7 @@ void switchAdminMenu(int optionMenuClient){
     }
 
     fclose(fileAdmin);
+    fclose(fileClient);
 }
 
 void registerAdmin(
@@ -149,7 +155,8 @@ int loginAdmin(
         fgets(password, 100, stdin);
 
         while (fread(&admin, sizeof(admin), 1, fileAdmin)){
-            if(!strcmp(email, admin.email) && !strcmp(password, admin.password)){
+            if(admin.del != '*'){
+                if(!strcmp(email, admin.email) && !strcmp(password, admin.password)){
 
                 printf("\n Bem vindo %s !", admin.name);
                 printf("Fazendo login...\n");
@@ -157,8 +164,9 @@ int loginAdmin(
 
                 return True;
 
+             }
             }
-
+            
             i++;
         }
 
@@ -196,11 +204,9 @@ int getAdmin(int id, FILE *nameFile){
     
 }
 
-int MenuAdminLogin() {
+int MenuAdminLogin(FILE *fileAdmin, FILE *fileClient) {
     int option, optionMenuTenis;
     int error = False;
-
-    ClearWindows();
 
     do {
 
@@ -213,6 +219,11 @@ int MenuAdminLogin() {
 
         printf("\n===================================\n\n");
 
+        printf("9 -> LISTAR TODOS OS ADMINISTRADORES \n");
+        printf("10 -> EXCLUIR UM ADMINISTRADOR \n");
+
+        printf("\n===================================\n\n");
+
         printf("0 -> SAIR DA MINHA CONTA \n");
 
         printf("\n===================================\n\n");
@@ -221,7 +232,7 @@ int MenuAdminLogin() {
         ClearBuffer();
         scanf("%d", &option);
 
-        error = option > 8 || option < 0 ? True : False;
+        error = option > 10 || option < 0 ? True : False;
 
         if(error)
             printf("\n Erro opção invalida! \n TENTE NOVAMENTE \n");
@@ -229,7 +240,78 @@ int MenuAdminLogin() {
         if(option >= 1 && option <= 6)
             switchTenisMenu(option);
 
+        else {
+            switch(option){
+                case 7: 
+                    listClient(fileClient);
+                    break;
+                case 8:
+                    deleteClient(fileClient);
+                    break;
+                case 9:
+                    listAdmin(fileAdmin);
+                    break;
+                case 10:
+                    deleteAdmin(fileAdmin);
+                    break;
+            }
+        }
+
     } while(error);
 
     return option;
+}
+
+void listAdmin( FILE *fileAdmin ){
+
+    struct adminData admin;
+
+    fseek(fileAdmin, 0, SEEK_SET);
+
+    while(fread(&admin, sizeof(admin), 1, fileAdmin)){
+        if(admin.del != '*'){
+            printf("Id do administrador: %d\n", admin.id);
+            printf("Nome do administrador: %s\n", admin.name);
+            printf("Email do administrador: %s\n", admin.email);
+        }
+    }
+    
+}
+
+void deleteAdmin(FILE *fileAdmin){
+    struct adminData admin;
+    int index;
+
+    do{
+        printf("Digite o codigo do administrador: ");
+        ClearBuffer();
+        scanf("%d", &admin.id);
+
+        index = getAdmin(admin.id, fileAdmin);
+
+        if(index < 0)
+            printf("\n\n   ERRO!, codigo não existente, tente novamente!    \n\n");
+            
+    }while(index < 0);
+
+    if(index > 0)
+        eraseAdmin(index, fileAdmin);
+    else 
+        printf("Administrador não encontrado !!!\n");
+}
+
+void eraseAdmin(int index, FILE *fileAdmin){
+    struct adminData admin;
+
+    fseek(fileAdmin, (index-1)*sizeof(admin), SEEK_SET);
+
+    fread(&admin, sizeof(admin), 1, fileAdmin);
+
+    admin.del = '*';
+
+    fseek(fileAdmin, -sizeof(admin), SEEK_CUR);
+
+    fwrite(&admin, sizeof(admin), 1, fileAdmin);
+
+    printf("Administrador apagado com sucesso!");
 }
