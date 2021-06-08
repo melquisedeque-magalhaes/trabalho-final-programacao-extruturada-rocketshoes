@@ -28,8 +28,11 @@ int main(void){
                 optionMenuAdmin = MenuAdmin();
                 switchAdminMenu(optionMenuAdmin);
                 break;
-
-
+            case 3:
+                deletePermanteTenis();
+                printf("Cache do programa apagado ! \n");
+                
+                break;
             default:
                 printf("SAINDO DO PROGRAMA ....\n\n\n");
         }
@@ -49,13 +52,14 @@ int menuMain() {
         printf("\n \n MENU \n \n");
         printf("1 -> CLIENTE \n");
         printf("2 -> ADMINISTRADOR \n");
+        printf("3 -> APAGAR CACHE \n");
         printf("0 -> SAIR DO PROGRAMA \n\n\n");
 
         printf("Digite sua opção: ");
         ClearBuffer();
         scanf("%d", &option);
 
-        errorMenuOption = option > 2 || option < 0 ? True : False;
+        errorMenuOption = option > 3 || option < 0 ? True : False;
 
         if(errorMenuOption)
             printf("Erro opção invalida! \n TENTE NOVAMENTE \n");

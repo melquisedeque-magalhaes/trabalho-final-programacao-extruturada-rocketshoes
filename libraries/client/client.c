@@ -2,11 +2,11 @@
 #include "../files/files.c"
 #include "../settings/settings.h"
 #include "string.h"
+#include "../tenis/tenis.h"
+#include "../cart/cart.c"
 
 #define True 1
 #define False 0
-
-#define LENGTH 100
 
 struct clientData {
 
@@ -14,9 +14,9 @@ struct clientData {
     char name[100];
     char password[50];
     char email[100];
-
+    char del;
+    
 };
-
 
 int MenuClient() {
     int option;
@@ -63,8 +63,17 @@ void switchClientMenu(int optionMenuClient){
             break;
         case 2:
             isLogin = loginClient(client, fileClient);
-            if(isLogin)
-                option = MenuClientLogin();
+
+            if(isLogin){
+                do{
+
+                    option = MenuClientLogin();
+                    switchLoginMenu(option, isLogin);
+
+                }while(option != 0);
+                
+            }
+                
             break;
         default:
             printf("\n Error escolha invalida! \n");
@@ -146,7 +155,7 @@ int loginClient(
                 printf("Fazendo login...\n");
                 
 
-                return True;
+                return client.id;
 
             }
 
@@ -167,7 +176,7 @@ int loginClient(
 
     ClearWindows();
 
-    return False;
+    return -1;
 
 }
 
@@ -193,17 +202,24 @@ int MenuClientLogin() {
     int error = False;
 
     do {
+        printf("===================================\n");
+        printf("        MENU DE COMPRAS \n");
+        printf("===================================\n");
 
-        printf("\n \n MENU DE COMPRAS \n \n");
-        printf("1 -> LISTAR TODOS OS TENIS \n");
-        printf("2 -> MOSTRAR CARRINHO \n");
-        printf("0 -> SAIR DA MINHA CONTA \n\n\n");
+        MenuCart();
+
+        printf("5 -> LISTAR TODOS OS TENIS \n");
+        printf("===================================\n");
+
+        printf("0 -> SAIR DA MINHA CONTA \n\n");
+        printf("===================================\n");
+
 
         printf("Digite sua opção: ");
         ClearBuffer();
         scanf("%d", &option);
 
-        error = option > 2 || option < 0 ? True : False;
+        error = option > 5 || option < 0 ? True : False;
 
         if(error)
             printf("\n Erro opção invalida! \n TENTE NOVAMENTE \n");
@@ -211,4 +227,27 @@ int MenuClientLogin() {
     } while(error);
 
     return option;
+}
+
+void switchLoginMenu(int option, int clientId){
+
+    FILE *fileTenis;
+
+    fileTenis = openFile("./files/tenis.dat");
+
+    if(fileTenis == NULL)
+        printf("\n ERRO de abertura do arquivo! \n");
+
+
+    if(option > 0 && option < 5)
+        switchCart(option, clientId);
+
+    switch(option){
+
+        case 5: 
+            listTenis(fileTenis);
+            break;
+    }
+
+    fclose(fileTenis);
 }

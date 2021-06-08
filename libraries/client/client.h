@@ -18,4 +18,6 @@ int getClient(int id, FILE *nameFile);
 
 int MenuClientLogin();
 
+void switchLoginMenu(int option, int clientId);
+
 #endif

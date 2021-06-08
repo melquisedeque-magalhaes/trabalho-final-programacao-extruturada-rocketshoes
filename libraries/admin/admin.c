@@ -2,6 +2,7 @@
 #include "../files/files.h"
 #include "../settings/settings.h"
 #include "string.h"
+#include "../tenis/tenis.c"
 
 #define True 1
 #define False 0
@@ -12,9 +13,9 @@ struct adminData {
     char name[100];
     char password[50];
     char email[100];
-
+    char del;
+    
 };
-
 
 int MenuAdmin() {
     int option;
@@ -62,8 +63,16 @@ void switchAdminMenu(int optionMenuClient){
         case 2:
             isLogin = loginAdmin(admin, fileAdmin);
 
-            if(isLogin)
-                option = MenuAdminLogin();
+        
+            if(isLogin){
+                do{
+                   
+                    option = MenuAdminLogin();
+
+                }while(option != 0);
+            }
+
+            ClearWindows();
 
             break;
         default:
@@ -188,33 +197,23 @@ int getAdmin(int id, FILE *nameFile){
 }
 
 int MenuAdminLogin() {
-    int option;
+    int option, optionMenuTenis;
     int error = False;
+
+    ClearWindows();
 
     do {
 
         printf("\n \n MENU ADM \n \n");
 
-        printf("\n===================================\n\n");
+        menuTenis();
 
-        printf("1 -> LISTAR TODOS OS TENIS \n");
-        printf("2 -> CONSULTAR UM TENIS \n");
-        printf("3 -> ADICIONAR TENIS \n");
-        printf("4 -> ALTERAR TENIS \n");
-        printf("5 -> EXCLUIR TENIS \n");
+        printf("7 -> LISTAR TODOS OS CLIENTES \n");
+        printf("8 -> EXCLUIR UM CLIENTE \n");
 
         printf("\n===================================\n\n");
 
-        printf("6 -> LISTAR TODOS OS CLIENTES \n");
-        printf("7 -> EXCLUIR UM CLIENTE \n");
-
-        printf("\n===================================\n\n");
-
-        printf("8 -> LISTAR COMPRAS \n");
-
-        printf("\n===================================\n\n");
-
-        printf("0 -> SAIR DA MINHA CONTA \n\n\n");
+        printf("0 -> SAIR DA MINHA CONTA \n");
 
         printf("\n===================================\n\n");
 
@@ -226,6 +225,9 @@ int MenuAdminLogin() {
 
         if(error)
             printf("\n Erro opção invalida! \n TENTE NOVAMENTE \n");
+
+        if(option >= 1 && option <= 6)
+            switchTenisMenu(option);
 
     } while(error);
 
