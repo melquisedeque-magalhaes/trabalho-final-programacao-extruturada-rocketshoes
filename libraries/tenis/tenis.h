@@ -17,6 +17,8 @@ void registerTenis();
 
 void listTenis(FILE *fileTenis );
 
+int haveTenisStock( FILE *fileTenis );
+
 void ConsultTenis(FILE *fileTenis);
 
 struct tenisData readTenis(int reg, FILE *fileTenis);

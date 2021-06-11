@@ -26,4 +26,8 @@ void deleteClient(FILE *fileClient);
 
 void eraseClient(int index, FILE *fileClient);
 
+struct clientData readClient(int id, FILE *fileClient);
+
+int getByEmail(char email [], FILE *file);
+
 #endif

@@ -170,17 +170,40 @@ void listTenis( FILE *fileTenis ){
 
     struct tenisData tenis;
 
+    int haveTenis = haveTenisStock(fileTenis);
+
+    if(haveTenis){
+        fseek(fileTenis, 0, SEEK_SET);
+
+        while(fread(&tenis, sizeof(tenis), 1, fileTenis)){
+            if(tenis.del != '*'){
+                printf("Id do tenis: %d\n", tenis.id);
+                printf("Nome do tenis: %s\n", tenis.name);
+                printf("Preço do tenis: %.2f\n", tenis.price);
+                printf("Quantidade de tenis no estoque: %d\n", tenis.amount);
+            }
+        } 
+    }
+    
+}
+
+int haveTenisStock( FILE *fileTenis ){
+
+    struct tenisData tenis;
+
     fseek(fileTenis, 0, SEEK_SET);
+
+    ClearWindows();
 
     while(fread(&tenis, sizeof(tenis), 1, fileTenis)){
         if(tenis.del != '*'){
-            printf("Id do tenis: %d\n", tenis.id);
-            printf("Nome do tenis: %s\n", tenis.name);
-            printf("Preço do tenis: %.2f\n", tenis.price);
-            printf("Quantidade de tenis no estoque: %d\n", tenis.amount);
+            return True;  
         }
     }
-    
+
+    printf("\n\nDesculpe o estoque de tenis estar vazio tente novamente mais tarde!\n\n");
+    return False; 
+
 }
 
 struct tenisData readTenis(int reg, FILE *fileTenis) {

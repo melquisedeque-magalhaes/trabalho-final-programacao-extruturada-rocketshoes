@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "settings.h": "c"
+        "settings.h": "c",
+        "client.h": "c"
     }
 }

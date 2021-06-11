@@ -1,7 +1,10 @@
+#include "string.h"
+#include <ctype.h> 
+
 #include "client.h"
 #include "../files/files.c"
 #include "../settings/settings.h"
-#include "string.h"
+
 #include "../tenis/tenis.h"
 #include "../cart/cart.c"
 
@@ -64,7 +67,7 @@ void switchClientMenu(int optionMenuClient){
         case 2:
             isLogin = loginClient(client, fileClient);
 
-            if(isLogin){
+            if(isLogin != -1){
                 do{
 
                     option = MenuClientLogin();
@@ -89,10 +92,12 @@ void registerCLient(
     int reg
 ){
     int index;
+    int erro = False;
 
     printf("\n\n\n ### REGISTRANDO CLIENTE ### \n\n\n");
 
     do{
+
         printf("Digite o codigo do cliente: ");
         ClearBuffer();
         scanf("%d", &client.id);
@@ -112,16 +117,28 @@ void registerCLient(
     ClearBuffer();
     fgets(client.password, 100, stdin);
 
-    printf("Digite seu e-mail: ");
-    ClearBuffer();
-    fgets(client.email, 100, stdin);
+    do{
 
+        printf("Digite seu e-mail: ");
+        ClearBuffer();
+        fgets(client.email, 100, stdin);
+
+        erro = getByEmail(client.email, fileClient);
+
+        if(erro)
+            printf("\nE-mail ja cadastrado tente um email diferente!\n\n");
+
+    } while(erro);
+
+    
     if(reg <= 0)
         fseek(fileClient, 0, SEEK_END);
     else 
         fseek(fileClient, (client.id - 1) * sizeof(client), SEEK_SET);
 
     fwrite(&client, sizeof(client), 1, fileClient);
+
+    ClearWindows();
 }
 
 int loginClient(
@@ -137,6 +154,7 @@ int loginClient(
 
     do {
         fseek(fileClient, 0, SEEK_SET);
+        ClearWindows();
 
         printf("\n\n\n ### FAZENDO LOGIN DO CLIENTE ### \n\n\n");
 
@@ -149,10 +167,11 @@ int loginClient(
         fgets(password, 100, stdin);
 
         while (fread(&client, sizeof(client), 1, fileClient)){
+            
             if(!strcmp(email, client.email) && !strcmp(password, client.password)){
 
-                printf("\n Bem vindo %s !", client.name);
-                printf("Fazendo login...\n");
+                printf("\n Bem vindo %s \n", client.name);
+                printf("Fazendo login...\n\n");
                 
 
                 return client.id;
@@ -164,15 +183,24 @@ int loginClient(
 
         printf("\n Sinto muito Email ou Senha incorreta! \n");
 
-        printf("Deseja tentar novamente ? (S) Sim ou (N) Não: ");
-        optionThen = getchar();
+
+        do{
+
+            printf("Deseja tentar novamente ? (S) Sim ou (N) Não: ");
+            ClearBuffer();
+            optionThen = toupper(getchar());
+
+            if(optionThen != 'N' && optionThen != 'S')
+                printf("Opção invalida tente novamente! \n");
+
+        }while (optionThen != 'N' && optionThen != 'S');
 
         if(optionThen == 'N' | optionThen == 'n'){
             exitSignIN = True;
-            error = False;
+            error = True;
         }
 
-    } while(error || !exitSignIN);
+    } while(!error || !exitSignIN);
 
     ClearWindows();
 
@@ -291,6 +319,7 @@ void deleteClient(FILE *fileClient){
 }
 
 void eraseClient(int index, FILE *fileClient){
+
     struct clientData client;
 
     fseek(fileClient, (index-1)*sizeof(client), SEEK_SET);
@@ -304,4 +333,34 @@ void eraseClient(int index, FILE *fileClient){
     fwrite(&client, sizeof(client), 1, fileClient);
 
     printf("Cliente apagado com sucesso!");
+}
+
+struct clientData readClient(int index, FILE *fileClient) {
+	struct clientData client;
+        
+    fseek(fileClient, (index - 1) * sizeof(client), SEEK_SET);
+
+    fread(&client, sizeof(client), 1, fileClient);
+
+    printf("id: %d\n", client.id);
+
+ 	return client;
+}
+
+int getByEmail(char email [], FILE *file){
+
+    struct clientData clientTmp;
+    int erro;
+
+    fseek(file, 0, SEEK_SET);
+
+    while(fread(&clientTmp, sizeof(clientTmp), 1, file)){
+
+        if(!strcmp(clientTmp.email, email))
+            return erro = True;
+            
+    }
+
+    return erro = False;
+
 }

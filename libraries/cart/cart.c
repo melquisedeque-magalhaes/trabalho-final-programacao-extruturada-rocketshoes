@@ -36,26 +36,35 @@ void MenuCart() {
 
 }
 
-void listTenisCart( FILE *fileCart){
+int listTenisCart( FILE *fileCart, FILE *fileTenis){
 
     struct cartData cart;
+
+    int isEmptyCart = True;
 
     fseek(fileCart, 0, SEEK_SET);
 
     ClearWindows();
 
     while(fread(&cart, sizeof(cart), 1, fileCart)){
+
         if(cart.del != '*'){
+
             printf("id do carrinho: %d\n", cart.id);
             printf("id do cliente: %d\n", cart.clientId);
             printf("id do tenis: %d\n", cart.tenis.id);
             printf("nome do tenis: %s\n", cart.tenis.name);
             printf("preço do tenis: %.2f\n", cart.tenis.price);
             printf("quantidade do tenis no estoque: %d\n", cart.tenis.amount);
+
+            isEmptyCart = False;
+
         }
             
     }
     
+    return isEmptyCart;
+     
 }
 
 struct tenisDataCart readTenisCart(int reg, FILE *fileTenis) {
@@ -78,50 +87,57 @@ void registerTenisCart(
 
     int index;
 
-    printf("\n\n\n ### REGISTRANDO TENIS NO CARRINHO ### \n\n\n");
+    int haveTenis = haveTenisStock(fileTenis);
 
-    do{
-        printf("Digite o codigo do carrinho: ");
-        ClearBuffer();
-        scanf("%d", &tenisCart.id);
+    if(haveTenis){
 
-        index = getTenis(tenisCart.id, fileCart);
+        printf("\n\n\n ### REGISTRANDO TENIS NO CARRINHO ### \n\n\n");
 
-        if(index > 0)
-            printf("\n\n   ERRO!, codigo ja existente, tente novamente!    \n\n");
-            
-    }while(index > 0);
+        do{
+            printf("Digite o codigo do carrinho: ");
+            ClearBuffer();
+            scanf("%d", &tenisCart.id);
 
-    tenisCart.clientId = idClient;
+            index = getTenis(tenisCart.id, fileCart);
 
-    do{
-        printf("Digite o codigo do tenis: ");
-        ClearBuffer();
-        scanf("%d", &tenisCart.tenis.id);
+            if(index > 0)
+                printf("\n\n   ERRO!, codigo ja existente, tente novamente!    \n\n");
+                
+        }while(index > 0);
 
-        index = getTenis(tenisCart.tenis.id, fileTenis);
+        tenisCart.clientId = idClient;
 
-        if(index < 0)
-            printf("\n\n   ERRO!,codigo não existente, tente novamente!    \n\n");
-            
-    }while(index < 0);
+        do{
+            printf("Digite o codigo do tenis: ");
+            ClearBuffer();
+            scanf("%d", &tenisCart.tenis.id);
 
-    tenisCart.tenis = readTenisCart(index, fileTenis);
+            index = getTenis(tenisCart.tenis.id, fileTenis);
 
-    if(reg <= 0)
-        fseek(fileCart, 0, SEEK_END);
-    else 
-        fseek(fileCart, (tenisCart.id - 1) * sizeof(tenisCart), SEEK_SET);
+            if(index < 0)
+                printf("\n\n   ERRO!,codigo não existente, tente novamente!    \n\n");
+                
+        }while(index < 0);
 
-    fwrite(&tenisCart, sizeof(tenisCart), 1, fileCart);
+        tenisCart.tenis = readTenisCart(index, fileTenis);
 
-    printf("Tenis adicionado no carrinho!\n");
+        if(reg <= 0)
+            fseek(fileCart, 0, SEEK_END);
+        else 
+            fseek(fileCart, (tenisCart.id - 1) * sizeof(tenisCart), SEEK_SET);
+
+        fwrite(&tenisCart, sizeof(tenisCart), 1, fileCart);
+
+        printf("Tenis adicionado no carrinho!\n");
+
+    }
 }
 
 
 void switchCart(int option, int clientId ){
 
     struct cartData cart;
+    int isEmptyCart;
 
     /* ABRINDO ARQUIVOS */
 
@@ -142,10 +158,14 @@ void switchCart(int option, int clientId ){
             registerTenisCart(cart, fileCart, -1, clientId, fileTenis);
             break;
         case 2: 
-            listTenisCart(fileCart);
+            isEmptyCart = listTenisCart(fileCart, fileTenis);
+
+            if(isEmptyCart)
+                printf("\nO carrinho estar vazio!\n\n");
+
             break;
         case 3:
-            deleteCartTenis(fileCart);
+            deleteCartTenis(fileCart, fileTenis);
             break;
     }
 
@@ -170,28 +190,33 @@ int getTenisCart(int id, FILE *nameFile){
     
 }
 
-void deleteCartTenis(FILE *fileCart){
+void deleteCartTenis(FILE *fileCart, FILE *fileTenis){
     struct cartData cart;
     int index;
 
     ClearWindows();
 
-    do{
-        printf("Digite o codigo do carrinho: ");
-        ClearBuffer();
-        scanf("%d", &cart.id);
+    int haveTenis = haveTenisStock(fileTenis);
 
-        index = getTenisCart(cart.id, fileCart);
+    if(haveTenis){
+        do{
+            printf("Digite o codigo do carrinho: ");
+            ClearBuffer();
+            scanf("%d", &cart.id);
 
-        if(index < 0)
-            printf("\n\n   ERRO!, codigo não existente, tente novamente!    \n\n");
-            
-    }while(index < 0);
+            index = getTenisCart(cart.id, fileCart);
 
-    if(index > 0)
-        eraseCartTenis(index, fileCart);
-    else 
-        printf("Tenis não encontrado no carrinho !!!\n");
+            if(index < 0)
+                printf("\n\n   ERRO!, codigo não existente, tente novamente!    \n\n");
+                
+        }while(index < 0);
+
+        if(index > 0)
+            eraseCartTenis(index, fileCart);
+        else 
+            printf("Tenis não encontrado no carrinho !!!\n");
+    }
+    
 }
 
 void eraseCartTenis(int index, FILE *fileCart){
